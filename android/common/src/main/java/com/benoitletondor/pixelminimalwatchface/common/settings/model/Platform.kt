@@ -36,7 +36,6 @@ interface Platform {
     fun startWidgetConfigurationScreen(navController: NavController, complicationLocation: ComplicationLocation)
 
     fun isUserPremium(): Boolean
-    fun watchIsUserPremium(): Flow<Boolean>
 
     fun showWearOSLogo(): Boolean
     suspend fun setShowWearOSLogo(shouldShowWearOSLogo: Boolean)

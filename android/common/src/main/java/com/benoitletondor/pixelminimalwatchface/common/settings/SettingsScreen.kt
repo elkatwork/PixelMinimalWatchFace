@@ -62,7 +62,7 @@ interface SettingsScreen {
         platform: Platform,
         navController: NavController,
     ) {
-        val isUserPremium by platform.watchIsUserPremium().collectAsState(platform.isUserPremium())
+        val isUserPremium = true
         val useAndroid12 by platform.watchUseAndroid12Style().collectAsState(platform.useAndroid12Style())
         val showWatchBattery by platform.watchShowWatchBattery().collectAsState(platform.showWatchBattery())
         val showPhoneBattery by platform.watchShowPhoneBattery().collectAsState(platform.showPhoneBattery())

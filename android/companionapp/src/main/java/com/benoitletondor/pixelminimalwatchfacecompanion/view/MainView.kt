@@ -53,7 +53,6 @@ import com.benoitletondor.pixelminimalwatchfacecompanion.ui.components.AppTopBar
 import com.benoitletondor.pixelminimalwatchfacecompanion.ui.components.AppTopBarScaffold
 import com.benoitletondor.pixelminimalwatchfacecompanion.ui.components.settings.PhoneSettingsComposeComponents
 import com.benoitletondor.pixelminimalwatchfacecompanion.view.debugphonebatterysync.DebugPhoneBatterySync
-import com.benoitletondor.pixelminimalwatchfacecompanion.view.donation.Donation
 import com.benoitletondor.pixelminimalwatchfacecompanion.view.main.subviews.*
 import com.benoitletondor.pixelminimalwatchfacecompanion.view.notificationssync.NotificationsSyncView
 import com.benoitletondor.pixelminimalwatchfacecompanion.view.notificationssync.filter.NotificationsSyncFilterView
@@ -112,12 +111,6 @@ private fun MainView() {
                 deepLinks = listOf(navDeepLink { uriPattern = "$DEEPLINK_SCHEME://open" }),
             ) {
                 Main(navController, hiltViewModel())
-            }
-            composable(
-                route = NAV_DONATION_ROUTE,
-                deepLinks = listOf(navDeepLink { uriPattern = "$DEEPLINK_SCHEME://donate" }),
-            ) {
-                Donation(navController, hiltViewModel())
             }
             composable(
                 route = NAV_DEBUG_PHONE_BATTERY_SYNC_ROUTE,
@@ -357,12 +350,11 @@ private fun Main(navController: NavController, mainViewModel: MainViewModel) {
         },
         content = {
             when(val currentStep = step) {
-                is MainViewModel.Step.Error -> Error(error = currentStep.error) {
-                    mainViewModel.retryPremiumStatusCheck()
-                }
+//                is MainViewModel.Step.Error -> Error(error = currentStep.error) {
+//                    mainViewModel.retryPremiumStatusCheck()
+//                }
                 is MainViewModel.Step.InstallWatchFace -> InstallWatchFace(step = currentStep, viewModel = mainViewModel)
                 MainViewModel.Step.Loading -> Loading()
-                is MainViewModel.Step.NotPremium -> NotPremium(viewModel = mainViewModel)
                 is MainViewModel.Step.Premium -> Premium(step = currentStep, viewModel = mainViewModel)
                 MainViewModel.Step.Syncing -> Syncing()
             }

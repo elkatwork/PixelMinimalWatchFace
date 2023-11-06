@@ -15,25 +15,16 @@
  */
 package com.benoitletondor.pixelminimalwatchfacecompanion.injection
 
-import com.benoitletondor.pixelminimalwatchfacecompanion.BuildConfig
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.Billing
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.BillingImpl
-import com.benoitletondor.pixelminimalwatchfacecompanion.config.Config
-import com.benoitletondor.pixelminimalwatchfacecompanion.config.ConfigImpl
 import com.benoitletondor.pixelminimalwatchfacecompanion.device.Device
 import com.benoitletondor.pixelminimalwatchfacecompanion.device.DeviceImpl
 import com.benoitletondor.pixelminimalwatchfacecompanion.storage.Storage
 import com.benoitletondor.pixelminimalwatchfacecompanion.storage.StorageImpl
 import com.benoitletondor.pixelminimalwatchfacecompanion.sync.Sync
 import com.benoitletondor.pixelminimalwatchfacecompanion.sync.SyncImpl
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 private const val REMOTE_CONFIG_FETCH_THROTTLE_DEFAULT_VALUE_HOURS = 1L
@@ -41,12 +32,6 @@ private const val REMOTE_CONFIG_FETCH_THROTTLE_DEFAULT_VALUE_HOURS = 1L
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class SingletonBindingModule {
-    @Binds
-    @Singleton
-    abstract fun bindBilling(
-        billingImpl: BillingImpl
-    ): Billing
-
     @Binds
     @Singleton
     abstract fun bindSync(
@@ -64,25 +49,4 @@ abstract class SingletonBindingModule {
     abstract fun bindDevice(
         deviceImpl: DeviceImpl
     ): Device
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object SingletonModule {
-    @Provides
-    @Singleton
-    fun provideConfig(): Config {
-        val configSettings = FirebaseRemoteConfigSettings.Builder()
-            .setMinimumFetchIntervalInSeconds(if( BuildConfig.DEBUG ) {
-                0L
-            } else {
-                TimeUnit.HOURS.toSeconds(REMOTE_CONFIG_FETCH_THROTTLE_DEFAULT_VALUE_HOURS)
-            })
-            .build()
-
-        val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
-        firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
-
-        return ConfigImpl(firebaseRemoteConfig)
-    }
 }

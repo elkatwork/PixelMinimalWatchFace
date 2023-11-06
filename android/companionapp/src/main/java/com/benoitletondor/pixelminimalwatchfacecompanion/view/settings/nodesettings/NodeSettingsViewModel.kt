@@ -22,7 +22,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.benoitletondor.pixelminimalwatchfacecompanion.BuildConfig
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.Billing
 import com.benoitletondor.pixelminimalwatchfacecompanion.helper.MutableLiveFlow
 import com.benoitletondor.pixelminimalwatchfacecompanion.platform.PhonePlatform
 import com.benoitletondor.pixelminimalwatchfacecompanion.platform.SyncSession
@@ -43,7 +42,6 @@ import javax.inject.Inject
 @SuppressLint("StaticFieldLeak")
 class NodeSettingsViewModel @Inject constructor(
     @ApplicationContext private val appContext: Context,
-    private val billing: Billing,
     private val storage: Storage,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -91,7 +89,7 @@ class NodeSettingsViewModel @Inject constructor(
                     val initialState = syncSession.getInitialState()
                     if (DEBUG_LOGS) Log.d(TAG, "getInitialWatchState: initialState: $initialState")
 
-                    val platform = PhonePlatform(appContext, billing, syncSession, initialState, storage)
+                    val platform = PhonePlatform(appContext, syncSession, initialState, storage)
                     currentSettingsPlatform = platform
                     stateMutableFlow.value = State.Loaded(platform)
                 }

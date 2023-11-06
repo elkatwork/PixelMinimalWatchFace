@@ -19,11 +19,6 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.Billing
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.PremiumCheckStatus
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.PurchaseFlowResult
-import com.benoitletondor.pixelminimalwatchfacecompanion.config.Config
-import com.benoitletondor.pixelminimalwatchfacecompanion.config.getWarning
 import com.benoitletondor.pixelminimalwatchfacecompanion.helper.MutableLiveFlow
 import com.benoitletondor.pixelminimalwatchfacecompanion.helper.combine
 import com.benoitletondor.pixelminimalwatchfacecompanion.storage.Storage
@@ -37,9 +32,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val billing: Billing,
     private val sync: Sync,
-    private val config: Config,
     storage: Storage
 ) : ViewModel(), CapabilityClient.OnCapabilityChangedListener {
     private val navigationEventMutableFlow = MutableLiveFlow<NavigationDestination>()
@@ -61,14 +54,13 @@ class MainViewModel @Inject constructor(
     private val userForcedInstallStatusFlow = MutableStateFlow(UserForcedInstallStatus.UNSPECIFIED)
 
     private val currentStepFlow = combine(
-        billing.userPremiumEventStream,
         userIsBuyingPremiumStateFlow,
         appInstalledStatusStateFlow,
         isSyncingStateFlow,
         userForcedInstallStatusFlow,
         storage.isBatterySyncActivatedFlow(),
         storage.isNotificationsSyncActivatedFlow(),
-        flow { emit(config.getWarning()) },
+        flow { emit(null) },
         Companion::computeStep,
     ).stateIn(viewModelScope, SharingStarted.Eagerly, Step.Loading)
     val stepFlow: Flow<Step> = currentStepFlow
@@ -81,16 +73,7 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch {
-            billing.userPremiumEventStream
-                .collect { premiumStatus ->
-                    if( (premiumStatus == PremiumCheckStatus.Premium && lastSyncedPremiumStatusStateFlow.value == false) ||
-                        (premiumStatus == PremiumCheckStatus.NotPremium && lastSyncedPremiumStatusStateFlow.value == true) ||
-                        (premiumStatus == PremiumCheckStatus.Premium || premiumStatus == PremiumCheckStatus.NotPremium) && lastSyncedPremiumStatusStateFlow.value == null ) {
-                        syncState(premiumStatus == PremiumCheckStatus.Premium)
-                    }
-                }
-        }
+        viewModelScope.launch { syncState(true)}
 
         syncAppInstalledStatus()
         sync.subscribeToCapabilityChanges(this)
@@ -132,40 +115,6 @@ class MainViewModel @Inject constructor(
         sync.unsubscribeToCapabilityChanges(this)
 
         super.onCleared()
-    }
-
-    fun triggerSync() {
-        syncState(billing.isUserPremium())
-    }
-
-    fun retryPremiumStatusCheck() {
-        billing.updatePremiumStatusIfNeeded()
-    }
-
-    fun launchPremiumBuyFlow(host: Activity) {
-        viewModelScope.launch {
-            try {
-                userIsBuyingPremiumStateFlow.value = true
-
-                val result = withContext(Dispatchers.IO) {
-                    billing.launchPremiumPurchaseFlow(host)
-                }
-
-                // Success result will be handled automatically as notification to userPremiumEventObserver
-
-                if( result is PurchaseFlowResult.Error ){
-                    errorEventMutableFlow.emit(ErrorType.UnableToPay(Exception(result.reason)))
-                }
-            } catch (t: Throwable) {
-                if (t is CancellationException) {
-                    throw t
-                }
-
-                errorEventMutableFlow.emit(ErrorType.UnableToPay(t))
-            } finally {
-                userIsBuyingPremiumStateFlow.value = false
-            }
-        }
     }
 
     fun onVoucherInput(voucher: String) {
@@ -263,9 +212,8 @@ class MainViewModel @Inject constructor(
     sealed class Step {
         object Loading : Step()
         object Syncing : Step()
-        class Error(val error: Throwable) : Step()
+//        class Error(val error: Throwable) : Step()
         class InstallWatchFace(val appInstalledStatus: AppInstalledStatus) : Step()
-        object NotPremium : Step()
         class Premium(
             val isBatterySyncActivated: Boolean,
             val isNotificationsSyncActivated: Boolean,
@@ -307,7 +255,6 @@ class MainViewModel @Inject constructor(
 
     companion object {
         private fun computeStep(
-            premiumStatus: PremiumCheckStatus,
             userIsBuyingPremium: Boolean,
             appInstalledStatus: AppInstalledStatus,
             isSyncing: Boolean,
@@ -328,17 +275,11 @@ class MainViewModel @Inject constructor(
                 return Step.InstallWatchFace(appInstalledStatus)
             }
 
-            return when(premiumStatus) {
-                PremiumCheckStatus.Checking -> Step.Loading
-                is PremiumCheckStatus.Error -> Step.Error(premiumStatus.error)
-                PremiumCheckStatus.Initializing -> Step.Loading
-                PremiumCheckStatus.NotPremium -> Step.NotPremium
-                PremiumCheckStatus.Premium -> Step.Premium(
+            return Step.Premium(
                     isBatterySyncActivated,
                     isNotificationsSyncActivated,
                     maybeWarning,
                 )
-            }
         }
     }
 }

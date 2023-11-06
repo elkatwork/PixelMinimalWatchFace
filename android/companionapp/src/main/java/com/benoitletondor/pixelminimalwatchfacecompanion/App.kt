@@ -16,10 +16,7 @@
 package com.benoitletondor.pixelminimalwatchfacecompanion
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.Billing
-import com.benoitletondor.pixelminimalwatchfacecompanion.config.Config
 import com.benoitletondor.pixelminimalwatchfacecompanion.device.Device
 import com.benoitletondor.pixelminimalwatchfacecompanion.storage.Storage
 import dagger.hilt.android.HiltAndroidApp
@@ -28,8 +25,6 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class App : Application(), DefaultLifecycleObserver, CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Default) {
-    @Inject lateinit var billing: Billing
-    @Inject lateinit var config: Config
     @Inject lateinit var storage: Storage
     @Inject lateinit var device: Device
 
@@ -47,18 +42,6 @@ class App : Application(), DefaultLifecycleObserver, CoroutineScope by Coroutine
 
         if (storage.isForegroundServiceEnabled()) {
             device.startForegroundService()
-        }
-    }
-
-    override fun onStart(owner: LifecycleOwner) {
-        billing.updatePremiumStatusIfNeeded()
-
-        launch {
-            try {
-                config.fetch()
-            } catch (t: Throwable) {
-                Log.e("App", "Error syncing config", t)
-            }
         }
     }
 

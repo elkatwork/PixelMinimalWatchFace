@@ -56,8 +56,7 @@ import com.benoitletondor.pixelminimalwatchface.common.settings.navigateToColorS
 import com.benoitletondor.pixelminimalwatchface.common.settings.navigateToWidgetSelectionScreen
 import com.benoitletondor.pixelminimalwatchfacecompanion.BatteryStatusBroadcastReceiver
 import com.benoitletondor.pixelminimalwatchfacecompanion.BuildConfig
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.Billing
-import com.benoitletondor.pixelminimalwatchfacecompanion.billing.PremiumCheckStatus
+
 import com.benoitletondor.pixelminimalwatchfacecompanion.helper.RatingPopup
 import com.benoitletondor.pixelminimalwatchfacecompanion.storage.Storage
 import com.benoitletondor.pixelminimalwatchfacecompanion.view.NAV_DONATION_ROUTE
@@ -65,12 +64,9 @@ import com.benoitletondor.pixelminimalwatchfacecompanion.view.NAV_PHONE_BATTERY_
 import com.benoitletondor.pixelminimalwatchfacecompanion.view.NAV_PHONE_NOTIFICATIONS_SYNC_SETTINGS_ROUTE
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 
 class PhonePlatform(
     private val appContext: Context,
-    private val billing: Billing,
     private val syncSession: SyncSession,
     private val initialState: InitialState,
     private val storage: Storage,
@@ -145,11 +141,7 @@ class PhonePlatform(
         navController.navigateToWidgetSelectionScreen(complicationLocation)
     }
 
-    override fun isUserPremium(): Boolean = billing.isUserPremium()
-
-    override fun watchIsUserPremium(): Flow<Boolean> = billing.userPremiumEventStream
-        .filter { it is PremiumCheckStatus.Premium || it is PremiumCheckStatus.NotPremium || it is PremiumCheckStatus.Error }
-        .map { it is PremiumCheckStatus.Premium }
+    override fun isUserPremium(): Boolean = true
 
     private val showWearOSLogoCache = StorageCachedBoolValue(syncSession, initialState.settings, KEY_SHOW_WEAR_OS_LOGO)
     override fun showWearOSLogo(): Boolean = showWearOSLogoCache.get()

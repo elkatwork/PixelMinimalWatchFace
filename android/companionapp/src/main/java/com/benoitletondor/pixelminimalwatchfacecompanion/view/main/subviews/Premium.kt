@@ -53,7 +53,6 @@ fun Premium(
 ) {
     PremiumLayout(
         installWatchFaceButtonPressed = viewModel::onGoToInstallWatchFaceButtonPressed,
-        syncPremiumStatusButtonPressed = viewModel::triggerSync,
         donateButtonPressed = viewModel::onDonateButtonPressed,
         onSupportButtonPressed = viewModel::onSupportButtonPressed,
         isBatterySyncActivated = step.isBatterySyncActivated,
@@ -69,7 +68,6 @@ fun Premium(
 @Composable
 private fun PremiumLayout(
     installWatchFaceButtonPressed: () -> Unit,
-    syncPremiumStatusButtonPressed: () -> Unit,
     donateButtonPressed: () -> Unit,
     onSupportButtonPressed: () -> Unit,
     isBatterySyncActivated: Boolean,
@@ -90,7 +88,6 @@ private fun PremiumLayout(
                 bottomSheetScaffoldState,
                 installWatchFaceButtonPressed = installWatchFaceButtonPressed,
                 onSupportButtonPressed = onSupportButtonPressed,
-                syncPremiumStatusButtonPressed = syncPremiumStatusButtonPressed,
                 isBatterySyncActivated = isBatterySyncActivated,
                 isNotificationsSyncActivated = isNotificationsSyncActivated,
                 debugPhoneBatteryIndicatorButtonPressed = debugPhoneBatteryIndicatorButtonPressed,
@@ -290,7 +287,6 @@ private fun PremiumLayoutContent(
 private fun TroubleShootBottomSheet(
     bottomSheetScaffoldState: BottomSheetScaffoldState,
     installWatchFaceButtonPressed: () -> Unit,
-    syncPremiumStatusButtonPressed: () -> Unit,
     onSupportButtonPressed: () -> Unit,
     isBatterySyncActivated: Boolean,
     isNotificationsSyncActivated: Boolean,
@@ -306,12 +302,6 @@ private fun TroubleShootBottomSheet(
             }
             installWatchFaceButtonPressed()
         },
-        syncPremiumStatusButtonPressed = {
-            coroutineScope.launch {
-                bottomSheetScaffoldState.bottomSheetState.collapse()
-            }
-            syncPremiumStatusButtonPressed()
-        } ,
         onSupportButtonPressed = {
             coroutineScope.launch {
                 bottomSheetScaffoldState.bottomSheetState.collapse()
@@ -333,7 +323,6 @@ private fun TroubleShootBottomSheet(
 @Composable
 private fun TroubleshootingContent(
     installWatchFaceButtonPressed: () -> Unit,
-    syncPremiumStatusButtonPressed: () -> Unit,
     onSupportButtonPressed: () -> Unit,
     onCloseButtonPressed: () -> Unit,
     isBatterySyncActivated: Boolean,
@@ -411,16 +400,6 @@ private fun TroubleshootingContent(
             )
 
             Spacer(modifier = Modifier.height(5.dp))
-
-            TextButton(
-                onClick = syncPremiumStatusButtonPressed,
-                colors = blueButtonColors(),
-            ) {
-                Text(
-                    text = "Sync premium with Watch",
-                    textAlign = TextAlign.Center,
-                )
-            }
 
             if (isBatterySyncActivated) {
                 Spacer(modifier = Modifier.height(20.dp))
@@ -512,7 +491,6 @@ private fun Preview() {
     AppMaterialTheme {
         PremiumLayout(
             installWatchFaceButtonPressed = {},
-            syncPremiumStatusButtonPressed = {},
             donateButtonPressed = {},
             onSupportButtonPressed = {},
             isBatterySyncActivated = true,
@@ -531,7 +509,6 @@ private fun PreviewWarning() {
     AppMaterialTheme {
         PremiumLayout(
             installWatchFaceButtonPressed = {},
-            syncPremiumStatusButtonPressed = {},
             donateButtonPressed = {},
             onSupportButtonPressed = {},
             isBatterySyncActivated = true,
@@ -551,7 +528,6 @@ private fun TroubleshootPreview() {
         TroubleshootingContent(
             onSupportButtonPressed = {},
             installWatchFaceButtonPressed = {},
-            syncPremiumStatusButtonPressed = {},
             onCloseButtonPressed = {},
             isBatterySyncActivated = false,
             isNotificationsSyncActivated = false,
@@ -568,7 +544,6 @@ private fun TroubleshootPreviewBatterySyncActivated() {
         TroubleshootingContent(
             onSupportButtonPressed = {},
             installWatchFaceButtonPressed = {},
-            syncPremiumStatusButtonPressed = {},
             onCloseButtonPressed = {},
             isBatterySyncActivated = true,
             isNotificationsSyncActivated = false,
@@ -585,7 +560,6 @@ private fun TroubleshootPreviewNotificationsSyncActivated() {
         TroubleshootingContent(
             onSupportButtonPressed = {},
             installWatchFaceButtonPressed = {},
-            syncPremiumStatusButtonPressed = {},
             onCloseButtonPressed = {},
             isBatterySyncActivated = false,
             isNotificationsSyncActivated = true,
@@ -602,7 +576,6 @@ private fun TroubleshootPreviewNotificationsAndBatterySyncActivated() {
         TroubleshootingContent(
             onSupportButtonPressed = {},
             installWatchFaceButtonPressed = {},
-            syncPremiumStatusButtonPressed = {},
             onCloseButtonPressed = {},
             isBatterySyncActivated = true,
             isNotificationsSyncActivated = true,
