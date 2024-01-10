@@ -25,6 +25,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.DropdownMenuItem
@@ -86,7 +87,8 @@ const val NAV_NOTIFICATIONS_SYNC_FILTER_ROUTE = "notificationsSyncFilterRoute"
 private const val DEEPLINK_SCHEME = "pixelminimalwatchface"
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+//class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

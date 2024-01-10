@@ -29,12 +29,12 @@ fun <T2, T3, T4, T5, T6, T7, T8, R> combine(
     transform: suspend (T2, T3, T4, T5, T6, T7, T8) -> R
 ): Flow<R> = kotlinx.coroutines.flow.combine(flow2, flow3, flow4, flow5, flow6, flow7, flow8) { args: Array<*> ->
     transform(
-        args[1] as T2,
-        args[2] as T3,
-        args[3] as T4,
-        args[4] as T5,
-        args[5] as T6,
-        args[6] as T7,
-        args[7] as T8,
+        args[0] as T2,
+        args[1] as T3,
+        args[2] as T4,
+        args[3] as T5,
+        args[4] as T6,
+        args[5] as T7,
+        args[6] as T8,
     )
 }
