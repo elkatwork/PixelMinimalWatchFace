@@ -57,7 +57,6 @@ import com.benoitletondor.pixelminimalwatchface.common.settings.navigateToWidget
 import com.benoitletondor.pixelminimalwatchfacecompanion.BatteryStatusBroadcastReceiver
 import com.benoitletondor.pixelminimalwatchfacecompanion.BuildConfig
 
-import com.benoitletondor.pixelminimalwatchfacecompanion.helper.RatingPopup
 import com.benoitletondor.pixelminimalwatchfacecompanion.storage.Storage
 import com.benoitletondor.pixelminimalwatchfacecompanion.view.NAV_DONATION_ROUTE
 import com.benoitletondor.pixelminimalwatchfacecompanion.view.NAV_PHONE_BATTERY_SYNC_SETTINGS_ROUTE
@@ -120,7 +119,6 @@ class PhonePlatform(
     }
 
     override fun startFeedbackScreen(navController: NavController, activity: ComponentActivity) {
-        RatingPopup(activity).show()
     }
 
     override fun startDonationScreen(navController: NavController, activity: ComponentActivity) {
